@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Text Integrity Logger
+
+A Generic Hash Checker built with Next.js 15, TypeScript, Tailwind CSS, and Prisma (MongoDB).
+
+## Features
+- **Integrity Logging**: Stores raw text and its SHA-256 hash.
+- **Verification**: Recomputes the hash of stored text to detect tampering.
+- **Tamper Simulation**: Admin-only feature to simulate data corruption (modifies text without updating hash).
+- **Immutability**: Entries cannot be edited, only deleted.
+
+## Tech Stack
+- **Framework**: Next.js 15 (App Router)
+- **Database**: MongoDB (via Prisma ORM)
+- **Hashing**: Node.js `crypto` (SHA-256)
+- **Validation**: Zod (Server-side)
 
 ## Getting Started
 
-First, run the development server:
-
+### 1. Clone & Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo>
+cd text-integrity-logger
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Variables
+Create a `.env` file in the root:
+```env
+# MongoDB Connection String
+DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Secret Key for Tamper Feature
+TAMPER_SECRET_KEY="demo-secret-key"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Run Locally
+```bash
+npx prisma generate
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Data Model
+**Entry**:
+- `id`: MongoDB ObjectID
+- `text`: Raw text (max 10,000 chars)
+- `hash`: SHA-256 fingerprint
+- `textLength`: Byte length of text
+- `createdAt`: Timestamp
 
-To learn more about Next.js, take a look at the following resources:
+## How It Works
+1.  **Hashing**: When an entry is saved, the raw text is hashed using `crypto.createHash('sha256').update(text).digest('hex')`. No normalization is performed.
+2.  **Integrity Check**:
+    - Fetches the current text from the DB.
+    - Recomputes the SHA-256 hash.
+    - Compares it to the stored `hash`.
+    - Returns **Match** or **Changed**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Tamper Demo (Option A)
+A "Simulate Tamper" button allows modifying the text *without* updating the hash. This mimics a database intrusion or bit rot.
+- **Security**: Protected by `TAMPER_SECRET_KEY`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Future Improvements
+- **Audit Logs**: Track who checked verification multiple times.
+- **Merkle Tree**: For checking integrity of the entire dataset.
+- **Canonicalization**: Optional flag for normalized checks (e.g. ignore whitespace).
