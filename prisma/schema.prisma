@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Entry {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  text       String
+  hash       String
+  textLength Int
+  createdAt       DateTime @default(now())
+  integrityStatus String?  @default("Not Checked")
+}
