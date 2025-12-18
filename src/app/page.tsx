@@ -2,6 +2,9 @@ import { EntryForm } from '@/components/EntryForm'
 import { EntryList } from '@/components/EntryList'
 import { Suspense } from 'react'
 
+// Force dynamic rendering for the home page (real-time entries)
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
     return (
         <main className="min-h-screen bg-gray-50 p-8 font-sans">
