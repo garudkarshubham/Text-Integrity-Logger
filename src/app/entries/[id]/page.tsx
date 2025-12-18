@@ -4,7 +4,10 @@ import { CopyButton } from '@/components/CopyButton'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function EntryDetailPage({ params }: { params: { id: string } }) {
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic'
+
+export default async function EntryDetailPage({ params }: { params: Promise<{ id: string }> }) {
     // Await params in Next.js 15
     const { id } = await params
     const entry = await getEntryById(id)
