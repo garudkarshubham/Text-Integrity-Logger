@@ -33,7 +33,7 @@ export async function createEntry(formData: FormData) {
         return { success: true, id: entry.id }
     } catch (error) {
         console.error('Create Error:', error)
-        return { error: 'Failed to create entry' }
+        return { error: `Failed to create entry: ${(error as Error).message}` }
     }
 }
 
