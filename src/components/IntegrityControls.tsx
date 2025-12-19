@@ -2,11 +2,13 @@
 
 import { checkIntegrity, tamperEntry } from '@/actions/entry'
 import { useState } from 'react'
+import { TamperModal } from './TamperModal'
 
 export function IntegrityControls({ id, currentText }: { id: string, currentText: string }) {
     const [result, setResult] = useState<'Match' | 'Changed' | null>(null)
     const [checking, setChecking] = useState(false)
     const [tampering, setTampering] = useState(false)
+    const [showTamperModal, setShowTamperModal] = useState(false)
 
     async function handleCheck() {
         setChecking(true)
@@ -17,17 +19,13 @@ export function IntegrityControls({ id, currentText }: { id: string, currentText
         }
     }
 
-    async function handleTamper() {
-        if (!confirm('WARNING: This will modify the text WITHOUT updating the hash. This intentionally breaks integrity. Continue?')) return
-
-        const secretKey = prompt('Enter Admin Secret Key to proceed:')
-        if (!secretKey) return
-
+    async function handleTamper(secretKey: string) {
         setTampering(true)
         // Tamper by appending a visible marker or changing a char
         const tamperedText = currentText + ' [TAMPERED]'
         const res = await tamperEntry(id, tamperedText, secretKey)
         setTampering(false)
+        setShowTamperModal(false)
 
         if (res.error) {
             alert(res.error)
@@ -59,12 +57,19 @@ export function IntegrityControls({ id, currentText }: { id: string, currentText
             <div className="flex-grow"></div>
 
             <button
-                onClick={handleTamper}
+                onClick={() => setShowTamperModal(true)}
                 disabled={tampering}
                 className="px-4 py-2 text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 rounded-md text-sm font-medium"
             >
                 {tampering ? 'Tampering...' : 'Tamper'}
             </button>
+
+            <TamperModal
+                isOpen={showTamperModal}
+                onClose={() => setShowTamperModal(false)}
+                onConfirm={handleTamper}
+                isTampering={tampering}
+            />
         </div>
     )
 }

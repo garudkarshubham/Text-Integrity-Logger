@@ -2,16 +2,14 @@
 
 import { createEntry } from '@/actions/entry'
 import { useState } from 'react'
+import { SubmitButton } from './SubmitButton'
 
 export function EntryForm() {
     const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
 
     async function handleSubmit(formData: FormData) {
-        setLoading(true)
         setError(null)
         const res = await createEntry(formData)
-        setLoading(false)
 
         if (res.error) {
             setError(res.error)
@@ -32,13 +30,7 @@ export function EntryForm() {
                     required
                 />
                 {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="self-end px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 transition-colors font-medium"
-                >
-                    {loading ? 'Saving...' : 'Save Entry'}
-                </button>
+                <SubmitButton />
             </form>
         </div>
     )
