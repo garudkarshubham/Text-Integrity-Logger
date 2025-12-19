@@ -25,7 +25,7 @@ describe('Entry Actions', () => {
         process.env.TAMPER_SECRET_KEY = 'test-secret'
     })
 
-    // TEST 1: Creating an entry rejects empty text
+    // Creating an entry rejects empty text
     it('should reject empty text creation', async () => {
         const formData = new FormData()
         formData.append('text', '') // Empty
@@ -37,7 +37,7 @@ describe('Entry Actions', () => {
         expect(prisma.entry.create).not.toHaveBeenCalled()
     })
 
-    // TEST 2: Integrity check returns Match when text matches hash
+    // Integrity check returns Match when text matches hash
     it('should return Match when integrity is intact', async () => {
         // Mock existing entry
         const mockEntry = {
@@ -53,7 +53,7 @@ describe('Entry Actions', () => {
         expect(result.result).toBe('Match')
     })
 
-    // TEST 3: Integrity check returns Changed after Tamper
+    // Integrity check returns Changed after Tamper
     it('should return Changed when text is tampered', async () => {
         // Mock entry where text differs from hash
         const mockEntry = {

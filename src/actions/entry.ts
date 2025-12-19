@@ -11,6 +11,7 @@ const EntrySchema = z.object({
 
 export async function createEntry(formData: FormData) {
     try {
+        await new Promise(resolve => setTimeout(resolve, 2000))
         const text = formData.get('text') as string
         const validation = EntrySchema.safeParse({ text })
 
@@ -39,6 +40,7 @@ export async function createEntry(formData: FormData) {
 
 export async function checkIntegrity(id: string) {
     try {
+        await new Promise(resolve => setTimeout(resolve, 2000))
         const entry = await prisma.entry.findUnique({ where: { id } })
         if (!entry) return { error: 'Entry not found' }
 
@@ -62,6 +64,7 @@ export async function checkIntegrity(id: string) {
 
 export async function deleteEntry(id: string) {
     try {
+        await new Promise(resolve => setTimeout(resolve, 2000))
         await prisma.entry.delete({ where: { id } })
         revalidatePath('/')
         return { success: true }
@@ -71,6 +74,7 @@ export async function deleteEntry(id: string) {
 }
 
 export async function tamperEntry(id: string, newText: string, secretKey: string) {
+    await new Promise(resolve => setTimeout(resolve, 2000))
     // Security check
     const secret = process.env.TAMPER_SECRET_KEY
     if (!secret || secretKey !== secret) {
@@ -78,7 +82,7 @@ export async function tamperEntry(id: string, newText: string, secretKey: string
     }
 
     try {
-        // Option A: Update text ONLY. Keep hash unchanged.
+        // Update text ONLY. Keep hash unchanged.
         await prisma.entry.update({
             where: { id },
             data: { text: newText }
