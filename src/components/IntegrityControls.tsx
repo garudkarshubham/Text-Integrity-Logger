@@ -3,11 +3,13 @@
 import { checkIntegrity, tamperEntry } from '@/actions/entry'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/Toast'
 
 export function IntegrityControls({ id, currentText, isAdmin }: { id: string, currentText: string, isAdmin?: boolean }) {
-    const [result, setResult] = useState<'Match' | 'Changed' | null>(null)
+    const [result, setResult] = useState<'Verified' | 'Tampered' | null>(null)
     const [checking, setChecking] = useState(false)
     const router = useRouter()
+    const { success, error } = useToast()
 
     // Tamper State
     const [isEditing, setIsEditing] = useState(false)
@@ -19,7 +21,14 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
         const res = await checkIntegrity(id)
         setChecking(false)
         if (res.result) {
-            setResult(res.result as 'Match' | 'Changed')
+            setResult(res.result as 'Verified' | 'Tampered')
+            if (res.result === 'Verified') {
+                success('Integrity Verified: Hash matches content')
+            } else {
+                error('Integrity Warning: Content has been tampered')
+            }
+        } else if (res.error) {
+            error(res.error)
         }
     }
 
@@ -28,8 +37,9 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
         const res = await tamperEntry(id, tamperText)
         setIsTampering(false)
         if (res.error) {
-            alert(res.error)
+            error(res.error)
         } else {
+            success('Entry tampered successfully')
             setIsEditing(false)
             router.refresh() // Refresh to show new text
         }
@@ -55,11 +65,11 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
             )}
 
             {result && (
-                <span className={`px-4 py-2 rounded-full font-bold text-sm border ${result === 'Match'
+                <span className={`px-4 py-2 rounded-full font-bold text-sm border ${result === 'Verified'
                     ? 'bg-green-100 text-green-800 border-green-200'
                     : 'bg-red-100 text-red-800 border-red-200'
                     }`}>
-                    {result === 'Match' ? 'Match' : 'Changed'}
+                    {result === 'Verified' ? 'Verified' : 'Tampered'}
                 </span>
             )}
 

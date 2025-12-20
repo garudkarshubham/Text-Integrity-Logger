@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { tamperEntry, checkIntegrity, deleteEntry } from '@/actions/entry'
 import { CopyButton } from './CopyButton'
 import Link from 'next/link'
+import { useToast } from '@/components/ui/Toast'
 
 export function AdminDashboard({ entries }: { entries: Entry[] }) {
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -12,6 +13,7 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({})
     const [checkingMap, setCheckingMap] = useState<Record<string, boolean>>({})
     const [deletingMap, setDeletingMap] = useState<Record<string, boolean>>({})
+    const { success, error } = useToast()
 
     const handleStartTamper = (entry: Entry) => {
         setEditingId(entry.id)
@@ -31,12 +33,13 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
             // No key needed, cookie is checked by server
             const result = await tamperEntry(editingId, editText)
             if (result.error) {
-                alert(`Error: ${result.error}`)
+                error(result.error)
             } else {
+                success('Entry tampered successfully')
                 setEditingId(null)
             }
         } catch (e) {
-            alert('Failed to tamper')
+            error('Failed to tamper')
         } finally {
             setLoadingMap(prev => ({ ...prev, [editingId]: false }))
         }
@@ -45,22 +48,28 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
     const handleCheckIntegrity = async (id: string) => {
         setCheckingMap(prev => ({ ...prev, [id]: true }))
         try {
-            await checkIntegrity(id)
+            const res = await checkIntegrity(id)
+            if (res.result === 'Verified') {
+                success('Verified: Integrity Match')
+            } else if (res.result === 'Tampered') {
+                error('Warning: Integrity Violation')
+            }
         } catch (e) {
-            alert('Failed to check integrity')
+            error('Failed to check integrity')
         } finally {
             setCheckingMap(prev => ({ ...prev, [id]: false }))
         }
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this entry? This cannot be undone.')) return
+        if (!confirm('Are you sure you want to remove this entry? This cannot be undone.')) return
 
         setDeletingMap(prev => ({ ...prev, [id]: true }))
         try {
             await deleteEntry(id)
+            success('Entry removed')
         } catch (e) {
-            alert('Failed to delete')
+            error('Failed to remove')
         } finally {
             setDeletingMap(prev => ({ ...prev, [id]: false }))
         }
@@ -113,13 +122,13 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${entry.integrityStatus === 'Match'
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${entry.integrityStatus === 'Verified'
                                             ? 'bg-green-100 text-green-800 border-green-200'
-                                            : entry.integrityStatus === 'Changed'
+                                            : entry.integrityStatus === 'Tampered'
                                                 ? 'bg-red-100 text-red-800 border-red-200'
                                                 : 'bg-gray-100 text-gray-800 border-gray-200'
                                             }`}>
-                                            {entry.integrityStatus || 'Not Checked'}
+                                            {entry.integrityStatus || 'Unverified'}
                                         </span>
                                     </td>
                                     <td className="p-4 text-right space-x-2">
@@ -141,7 +150,7 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
                                             disabled={deletingMap[entry.id]}
                                             className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                                         >
-                                            {deletingMap[entry.id] ? '...' : 'Delete'}
+                                            {deletingMap[entry.id] ? '...' : 'Remove'}
                                         </button>
                                     </td>
                                 </tr>

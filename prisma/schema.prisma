@@ -13,7 +13,7 @@ model Entry {
   hash       String
   textLength Int
   createdAt       DateTime @default(now())
-  integrityStatus String?  @default("Not Checked")
+  integrityStatus String?  @default("Unverified")
   user            User?    @relation(fields: [userId], references: [id])
   userId          String?  @db.ObjectId
 }

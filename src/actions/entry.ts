@@ -28,6 +28,7 @@ export async function createEntry(formData: FormData) {
                 text: validatedText,
                 hash,
                 textLength: validatedText.length,
+                integrityStatus: 'Unverified',
                 userId: user.userId ?? undefined // Ensure undefined if null for Prisma compatibility
             } as any, // Cast to any to resolve transient type error
         })
@@ -48,7 +49,7 @@ export async function checkIntegrity(id: string) {
         const currentHash = computeHash(entry.text)
         const storedHash = entry.hash
 
-        const result = currentHash === storedHash ? 'Match' : 'Changed'
+        const result = currentHash === storedHash ? 'Verified' : 'Tampered'
 
         await prisma.entry.update({
             where: { id },
