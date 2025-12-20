@@ -38,7 +38,7 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
                 success('Entry tampered successfully')
                 setEditingId(null)
             }
-        } catch (e) {
+        } catch (_e) {
             error('Failed to tamper')
         } finally {
             setLoadingMap(prev => ({ ...prev, [editingId]: false }))
@@ -54,7 +54,7 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
             } else if (res.result === 'Tampered') {
                 error('Warning: Integrity Violation')
             }
-        } catch (e) {
+        } catch (_e) {
             error('Failed to check integrity')
         } finally {
             setCheckingMap(prev => ({ ...prev, [id]: false }))

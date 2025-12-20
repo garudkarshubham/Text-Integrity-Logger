@@ -1,6 +1,5 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { cookies } from 'next/headers';
-import { prisma } from './db';
 import { User, Role } from '@prisma/client';
 
 const SESSION_COOKIE_NAME = 'user_session';

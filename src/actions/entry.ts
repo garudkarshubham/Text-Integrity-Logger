@@ -29,14 +29,14 @@ export async function createEntry(formData: FormData) {
                 hash,
                 textLength: validatedText.length,
                 integrityStatus: 'Unverified',
-                userId: user.userId ?? undefined // Ensure undefined if null for Prisma compatibility
-            } as any, // Cast to any to resolve transient type error
+                userId: user.userId ?? undefined
+            },
         })
 
         revalidatePath('/')
         return { success: true, id: entry.id }
-    } catch (error) {
-        return { error: `Failed to create entry: ${(error as Error).message}` }
+    } catch (_error) {
+        return { error: `Failed to create entry: ${(_error as Error).message}` }
     }
 }
 
@@ -58,21 +58,21 @@ export async function checkIntegrity(id: string) {
 
         revalidatePath('/')
         return { result }
-    } catch (error) {
+    } catch (_error) {
         return { error: 'Failed to check integrity' }
     }
 }
 
 export async function deleteEntry(id: string) {
     try {
-        const user = await requireUser()
+        await requireUser()
         // Ideally we should check if entry belongs to user or if user is admin
         // For now, simple auth check + assuming UI hides button if not owner
 
         await prisma.entry.delete({ where: { id } })
         revalidatePath('/')
         return { success: true }
-    } catch (error) {
+    } catch (_error) {
         return { error: 'Failed to delete' }
     }
 }
@@ -93,7 +93,7 @@ export async function tamperEntry(id: string, newText: string) {
         })
         revalidatePath(`/entries/${id}`)
         return { success: true }
-    } catch (e) {
+    } catch (_e) {
         return { error: 'Failed to tamper' }
     }
 }

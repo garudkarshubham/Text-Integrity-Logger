@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createEntry, checkIntegrity, tamperEntry } from '@/actions/entry'
+import { createEntry, checkIntegrity } from '@/actions/entry'
 import { prisma } from '@/lib/db'
 
 // Mock Prisma
@@ -46,11 +46,11 @@ describe('Entry Actions', () => {
             hash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e', // SHA256 of "Hello World"
         }
 
-        vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as any)
+        vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as unknown as any)
 
         const result = await checkIntegrity('test-id')
 
-        expect(result.result).toBe('Match')
+        expect(result.result).toBe('Verified')
     })
 
     // Integrity check returns Changed after Tamper
@@ -61,10 +61,10 @@ describe('Entry Actions', () => {
             text: 'Hello World [TAMPERED]',
             hash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e', // Still hash of "Hello World"
         }
-        vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as any)
+        vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as unknown as any)
 
         const result = await checkIntegrity('test-id')
 
-        expect(result.result).toBe('Changed')
+        expect(result.result).toBe('Tampered')
     })
 })

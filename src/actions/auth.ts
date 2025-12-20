@@ -10,7 +10,7 @@ const userSchema = z.object({
     password: z.string().min(6),
 })
 
-export async function register(prevState: any, formData: FormData) {
+export async function register(prevState: unknown, formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
@@ -40,7 +40,7 @@ export async function register(prevState: any, formData: FormData) {
     redirect('/')
 }
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 

@@ -18,7 +18,7 @@ async function main() {
         })
         console.log(`✅ Success! User '${user.email}' is now an ADMIN.`)
         console.log('You can now access the admin dashboard at /admin')
-    } catch (error) {
+    } catch (_error) {
         console.error('❌ Failed to update user. Make sure the email exists.')
         // console.error(error)
     }

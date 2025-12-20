@@ -31,9 +31,9 @@ async function main() {
             where: { email },
             data: { password: hashedPassword },
         })
-        console.log(`✅ Success! Password for '${user.email}' has been updated.`)
-    } catch (error) {
-        console.error('❌ Failed to update password. Make sure the email exists.')
+        console.log(`Success! Password for '${user.email}' has been updated.`)
+    } catch (_error) {
+        console.error('Failed to update password. Make sure the email exists.')
         // console.error(error)
     }
 }

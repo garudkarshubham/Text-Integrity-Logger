@@ -3,7 +3,6 @@ import { EntryList } from '@/components/EntryList'
 import { Suspense } from 'react'
 import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 
 import { logout } from '@/actions/auth'
 
