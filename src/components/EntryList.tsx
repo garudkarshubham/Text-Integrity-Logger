@@ -66,7 +66,9 @@ export async function EntryList() {
                                         ? 'bg-red-100 text-red-800 border-red-200'
                                         : 'bg-gray-100 text-gray-800 border-gray-200'
                                     }`}>
-                                    {entry.integrityStatus || 'Unverified'}
+                                    {entry.integrityStatus === 'Verified' ? 'Verified' :
+                                        entry.integrityStatus === 'Tampered' ? 'Tampered' :
+                                            'Unverified'}
                                 </span>
                             </td>
                             <td className="p-4 text-right">
