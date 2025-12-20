@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createEntry, checkIntegrity } from '@/actions/entry'
 import { prisma } from '@/lib/db'
-import { requireUser } from '@/lib/auth' // Import needed for mocking
 
 // Mock Prisma
 vi.mock('@/lib/db', () => ({
@@ -15,23 +14,21 @@ vi.mock('@/lib/db', () => ({
     },
 }))
 
-// Mock Auth
-vi.mock('@/lib/auth', () => ({
-    requireUser: vi.fn(),
-    getCurrentUser: vi.fn(),
-}))
-
 // Mock RevalidatePath
 vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
+}))
+
+// Mock Auth
+vi.mock('@/lib/auth', () => ({
+    requireUser: vi.fn().mockResolvedValue({ userId: 'test-user-id' }),
+    getCurrentUser: vi.fn(),
 }))
 
 describe('Entry Actions', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         process.env.TAMPER_SECRET_KEY = 'test-secret'
-        // Default auth mock
-        vi.mocked(requireUser).mockResolvedValue({ userId: 'test-user', role: 'USER' } as any)
     })
 
     // Creating an entry rejects empty text

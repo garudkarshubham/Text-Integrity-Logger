@@ -1,19 +1,12 @@
 
+'use client'
 
-import { getEntries } from '@/data/entry'
+import { Entry } from '@/data/entry'
 import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
 import { CopyButton } from './CopyButton'
-import { getCurrentUser } from '@/lib/auth'
 
-export async function EntryList() {
-    const user = await getCurrentUser()
-
-    // If Admin, show ALL entries (undefined). If User, show only theirs (user.userId).
-    const filterUserId = user?.role === 'ADMIN' ? undefined : user?.userId
-
-    const entries = await getEntries(filterUserId)
-
+export function EntryList({ entries }: { entries: Entry[] }) {
     if (entries.length === 0) {
         return (
             <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
@@ -60,15 +53,15 @@ export async function EntryList() {
                                 {entry.createdAt.toLocaleString()}
                             </td>
                             <td className="p-4">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${entry.integrityStatus === 'Verified'
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified')
                                     ? 'bg-green-100 text-green-800 border-green-200'
-                                    : entry.integrityStatus === 'Tampered'
+                                    : (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered')
                                         ? 'bg-red-100 text-red-800 border-red-200'
                                         : 'bg-gray-100 text-gray-800 border-gray-200'
                                     }`}>
-                                    {entry.integrityStatus === 'Verified' ? 'Verified' :
-                                        entry.integrityStatus === 'Tampered' ? 'Tampered' :
-                                            'Unverified'}
+                                    {(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified') ? 'Checked' :
+                                        (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered') ? 'Changed' :
+                                            'Not Checked'}
                                 </span>
                             </td>
                             <td className="p-4 text-right">

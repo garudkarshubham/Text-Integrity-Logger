@@ -23,7 +23,7 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
         if (res.result) {
             setResult(res.result as 'Checked' | 'Changed')
             if (res.result === 'Checked') {
-                success('Integrity Checked: Hash matches content')
+                success('Integrity Verified: Hash matches content')
             } else {
                 error('Integrity Warning: Content has been changed')
             }

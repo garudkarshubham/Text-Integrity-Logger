@@ -1,7 +1,7 @@
-import { EntryForm } from '@/components/EntryForm'
-import { EntryList } from '@/components/EntryList'
+import { EntryManager } from '@/components/EntryManager'
 import { Suspense } from 'react'
 import { getCurrentUser } from '@/lib/auth'
+import { getEntries } from '@/data/entry'
 import { redirect } from 'next/navigation'
 
 import { logout } from '@/actions/auth'
@@ -16,9 +16,8 @@ export default async function Home() {
     }
 
     // Redirect admins to their specific page
-    if (user.role === 'ADMIN') {
-        redirect('/admin')
-    }
+    const filterUserId = user.role === 'ADMIN' ? undefined : user.userId
+    const entries = await getEntries(filterUserId)
 
     return (
         <main className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -42,18 +41,9 @@ export default async function Home() {
                     )}
                 </header>
 
-                <section>
-                    <EntryForm />
-                </section>
-
-                <section>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-gray-800">Saved Entries</h2>
-                    </div>
-                    <Suspense fallback={<div className="text-center py-12 text-gray-500 animate-pulse">Loading entries...</div>}>
-                        <EntryList />
-                    </Suspense>
-                </section>
+                <Suspense fallback={<div className="text-center py-12 text-gray-500 animate-pulse">Loading...</div>}>
+                    <EntryManager initialEntries={entries} />
+                </Suspense>
             </div>
         </main>
     )

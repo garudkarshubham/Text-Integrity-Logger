@@ -22,6 +22,7 @@ export async function getEntries(userId?: string): Promise<Entry[]> {
         return await prisma.entry.findMany({
             where,
             orderBy: { createdAt: 'desc' },
+            // Optimization: We could select fewer fields if text is huge, but we need it for UI title
         }) as Entry[]
     } catch {
         return []

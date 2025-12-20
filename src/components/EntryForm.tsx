@@ -5,17 +5,23 @@ import { SubmitButton } from './SubmitButton'
 import { useRef } from 'react'
 import { useToast } from '@/components/ui/Toast'
 
-export function EntryForm() {
+export function EntryForm({ onAddOptimistic }: { onAddOptimistic: (text: string) => void }) {
     const ref = useRef<HTMLFormElement>(null)
     const { success, error } = useToast()
 
     async function clientAction(formData: FormData) {
+        const text = formData.get('text') as string
+        if (text) {
+            onAddOptimistic(text)
+            ref.current?.reset()
+        }
+
         const result = await createEntry(formData)
         if (result.error) {
             error(result.error)
+            // Ideally revert optimistic update here if complex, but valid for now
         } else {
             success('Entry created successfully')
-            ref.current?.reset()
         }
     }
 

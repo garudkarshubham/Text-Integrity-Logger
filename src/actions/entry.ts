@@ -35,8 +35,8 @@ export async function createEntry(formData: FormData) {
 
         revalidatePath('/')
         return { success: true, id: entry.id }
-    } catch {
-        return { error: `Failed to create entry` }
+    } catch (_error) {
+        return { error: `Failed to create entry: ${(_error as Error).message}` }
     }
 }
 

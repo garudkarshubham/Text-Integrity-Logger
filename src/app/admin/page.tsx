@@ -1,9 +1,10 @@
 import { EntryForm } from '@/components/EntryForm'
-import { EntryList } from '@/components/EntryList'
+import { EntryManager } from '@/components/EntryManager'
 import { Suspense } from 'react'
 import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { logout } from '@/actions/auth'
+import { getEntries } from '@/data/entry'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,8 @@ export default async function AdminPage() {
     if (user.role !== 'ADMIN') {
         redirect('/')
     }
+
+    const entries = await getEntries() // Admin sees all
 
     return (
         <main className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -41,18 +44,9 @@ export default async function AdminPage() {
                     )}
                 </header>
 
-                <section>
-                    <EntryForm />
-                </section>
-
-                <section>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-gray-800">All Global Entries</h2>
-                    </div>
-                    <Suspense fallback={<div className="text-center py-12 text-gray-500 animate-pulse">Loading entries...</div>}>
-                        <EntryList />
-                    </Suspense>
-                </section>
+                <Suspense fallback={<div className="text-center py-12 text-gray-500 animate-pulse">Loading entries...</div>}>
+                    <EntryManager initialEntries={entries} title="All Global Entries" />
+                </Suspense>
             </div>
         </main>
     )
