@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createEntry, checkIntegrity } from '@/actions/entry'
 import { prisma } from '@/lib/db'
+import { requireUser } from '@/lib/auth' // Import needed for mocking
 
 // Mock Prisma
 vi.mock('@/lib/db', () => ({
@@ -14,6 +15,12 @@ vi.mock('@/lib/db', () => ({
     },
 }))
 
+// Mock Auth
+vi.mock('@/lib/auth', () => ({
+    requireUser: vi.fn(),
+    getCurrentUser: vi.fn(),
+}))
+
 // Mock RevalidatePath
 vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
@@ -23,6 +30,8 @@ describe('Entry Actions', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         process.env.TAMPER_SECRET_KEY = 'test-secret'
+        // Default auth mock
+        vi.mocked(requireUser).mockResolvedValue({ userId: 'test-user', role: 'USER' } as any)
     })
 
     // Creating an entry rejects empty text
@@ -37,8 +46,8 @@ describe('Entry Actions', () => {
         expect(prisma.entry.create).not.toHaveBeenCalled()
     })
 
-    // Integrity check returns Verified when text matches hash
-    it('should return Verified when integrity is intact', async () => {
+    // Integrity check returns Checked when text matches hash
+    it('should return Checked when integrity is intact', async () => {
         // Mock existing entry
         const mockEntry = {
             id: 'test-id',
@@ -51,11 +60,11 @@ describe('Entry Actions', () => {
 
         const result = await checkIntegrity('test-id')
 
-        expect(result.result).toBe('Verified')
+        expect(result.result).toBe('Checked')
     })
 
-    // Integrity check returns Tampered after Tamper
-    it('should return Tampered when text is tampered', async () => {
+    // Integrity check returns Changed after Tamper
+    it('should return Changed when text is tampered', async () => {
         // Mock entry where text differs from hash
         const mockEntry = {
             id: 'test-id',
@@ -67,6 +76,6 @@ describe('Entry Actions', () => {
 
         const result = await checkIntegrity('test-id')
 
-        expect(result.result).toBe('Tampered')
+        expect(result.result).toBe('Changed')
     })
 })

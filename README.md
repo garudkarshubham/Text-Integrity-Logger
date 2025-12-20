@@ -29,8 +29,8 @@ Create a `.env` file in the root:
 # MongoDB Connection String
 DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority"
 
-# Secret Key for Tamper Feature
-TAMPER_SECRET_KEY="demo-secret-key"
+# Session Secret (for cookie signing)
+SESSION_SECRET="complex-random-string-at-least-32-chars"
 ```
 
 ### 3. Run Locally
@@ -48,19 +48,33 @@ Open [http://localhost:3000](http://localhost:3000).
 - `textLength`: Byte length of text
 - `createdAt`: Timestamp
 
-## How It Works
-1.  **Hashing**: When an entry is saved, the raw text is hashed using `crypto.createHash('sha256').update(text).digest('hex')`. No normalization is performed.
-2.  **Integrity Check**:
+## How Hashing Works
+1.  Digital Fingerprint: Hashing turns any data (text, files, passwords) into a unique, fixed-length string of characters.
+
+2. One-Way: It is a mathematical process that cannot be reversed to reveal the  original input.
+
+3. Tamper Proof: Changing even a single character in the input results in a completely different hash, making it perfect for verifying data integrity.
+
+4.  **Integrity Check**:
     - Fetches the current text from the DB.
     - Recomputes the SHA-256 hash.
     - Compares it to the stored `hash`.
-    - Returns **Match** or **Changed**.
+    - Returns **Checked** or **Changed**.
 
-### Tamper Demo (Option A)
+### Tamper Demo
 A "Simulate Tamper" button allows modifying the text *without* updating the hash. This mimics a database intrusion or bit rot.
-- **Security**: Protected by `TAMPER_SECRET_KEY`.
+- **Security**: Protected by Admin Role.
+
+## User & Admin Setup
+Since there is no public registration for Admins, follow these steps:
+
+1.  **Create a User**: Open the app and sign up via the Login page.
+2.  **Make Admin**: Run the promotion script in your terminal:
+    ```bash
+    npx tsx scripts/promote-user.ts <email>
+    ```
 
 ## Future Improvements
 - **Audit Logs**: Track who checked verification multiple times.
 - **Merkle Tree**: For checking integrity of the entire dataset.
-- **Canonicalization**: Optional flag for normalized checks (e.g. ignore whitespace).
+

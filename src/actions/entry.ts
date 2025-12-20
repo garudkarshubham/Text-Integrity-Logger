@@ -28,15 +28,15 @@ export async function createEntry(formData: FormData) {
                 text: validatedText,
                 hash,
                 textLength: validatedText.length,
-                integrityStatus: 'Unverified',
+                integrityStatus: 'Not Checked',
                 userId: user.userId ?? undefined
             },
         })
 
         revalidatePath('/')
         return { success: true, id: entry.id }
-    } catch (_error) {
-        return { error: `Failed to create entry: ${(_error as Error).message}` }
+    } catch {
+        return { error: `Failed to create entry` }
     }
 }
 
@@ -49,7 +49,7 @@ export async function checkIntegrity(id: string) {
         const currentHash = computeHash(entry.text)
         const storedHash = entry.hash
 
-        const result = currentHash === storedHash ? 'Verified' : 'Tampered'
+        const result = currentHash === storedHash ? 'Checked' : 'Changed'
 
         await prisma.entry.update({
             where: { id },

@@ -9,7 +9,7 @@ export function DeleteButton({ id }: { id: string }) {
     const { success, error } = useToast()
 
     const handleRemove = () => {
-        if (!confirm('Are you sure you want to remove this entry?')) return
+        if (!confirm('Are you sure you want to delete this entry?')) return
 
         // Optimistic UI: Hide row immediately
         const row = document.getElementById(`entry-row-${id}`)
@@ -22,7 +22,7 @@ export function DeleteButton({ id }: { id: string }) {
                 // Revert on error
                 if (row) row.style.display = ''
             } else {
-                success('Entry removed')
+                success('Entry deleted')
             }
         })
     }
@@ -33,7 +33,7 @@ export function DeleteButton({ id }: { id: string }) {
             disabled={isPending}
             className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
         >
-            {isPending ? 'Removing...' : 'Remove'}
+            {isPending ? 'Deleting...' : 'Delete'}
         </button>
     )
 }
