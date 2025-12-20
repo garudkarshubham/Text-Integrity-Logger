@@ -9,11 +9,14 @@ export interface Entry {
     textLength: number
     createdAt: Date
     integrityStatus?: string | null
+    userId?: string | null
 }
 
-export async function getEntries(): Promise<Entry[]> {
+export async function getEntries(userId?: string): Promise<Entry[]> {
     try {
+        const where: any = userId ? { userId } : {}
         return await prisma.entry.findMany({
+            where,
             orderBy: { createdAt: 'desc' },
         }) as Entry[]
     } catch (error) {

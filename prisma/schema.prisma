@@ -14,4 +14,19 @@ model Entry {
   textLength Int
   createdAt       DateTime @default(now())
   integrityStatus String?  @default("Not Checked")
+  user            User?    @relation(fields: [userId], references: [id])
+  userId          String?  @db.ObjectId
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  password String // Hashed password
+  role     Role   @default(USER)
+  entries  Entry[]
+}
+
+enum Role {
+  USER
+  ADMIN
 }

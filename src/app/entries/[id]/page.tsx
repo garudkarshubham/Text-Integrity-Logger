@@ -3,14 +3,13 @@ import { IntegrityControls } from '@/components/IntegrityControls'
 import { CopyButton } from '@/components/CopyButton'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-
-// Force dynamic rendering for this route
-export const dynamic = 'force-dynamic'
+import { getCurrentUser } from '@/lib/auth'
 
 export default async function EntryDetailPage({ params }: { params: Promise<{ id: string }> }) {
     // Await params in Next.js 15
     const { id } = await params
     const entry = await getEntryById(id)
+    const user = await getCurrentUser()
 
     if (!entry) {
         notFound()
@@ -32,6 +31,7 @@ export default async function EntryDetailPage({ params }: { params: Promise<{ id
                         <div className="text-right">
                             <h1 className="font-mono text-sm text-gray-500 uppercase tracking-widest">Created At</h1>
                             <p className="text-gray-900">{entry.createdAt.toLocaleString()}</p>
+                            {user?.role === 'ADMIN' && <span className="text-xs text-red-600 font-bold ml-2">(Admin Mode)</span>}
                         </div>
                     </div>
 
@@ -51,7 +51,11 @@ export default async function EntryDetailPage({ params }: { params: Promise<{ id
                             </div>
                         </div>
 
-                        <IntegrityControls id={entry.id} currentText={entry.text} />
+                        <IntegrityControls
+                            id={entry.id}
+                            currentText={entry.text}
+                            isAdmin={user?.role === 'ADMIN'}
+                        />
                     </div>
                 </div>
             </div>

@@ -2,13 +2,17 @@
 
 import { checkIntegrity, tamperEntry } from '@/actions/entry'
 import { useState } from 'react'
-import { TamperModal } from './TamperModal'
+import { useRouter } from 'next/navigation'
 
-export function IntegrityControls({ id, currentText }: { id: string, currentText: string }) {
+export function IntegrityControls({ id, currentText, isAdmin }: { id: string, currentText: string, isAdmin?: boolean }) {
     const [result, setResult] = useState<'Match' | 'Changed' | null>(null)
     const [checking, setChecking] = useState(false)
-    const [tampering, setTampering] = useState(false)
-    const [showTamperModal, setShowTamperModal] = useState(false)
+    const router = useRouter()
+
+    // Tamper State
+    const [isEditing, setIsEditing] = useState(false)
+    const [tamperText, setTamperText] = useState(currentText)
+    const [isTampering, setIsTampering] = useState(false)
 
     async function handleCheck() {
         setChecking(true)
@@ -19,19 +23,15 @@ export function IntegrityControls({ id, currentText }: { id: string, currentText
         }
     }
 
-    async function handleTamper(secretKey: string) {
-        setTampering(true)
-        // Tamper by appending a visible marker or changing a char
-        const tamperedText = currentText + ' [TAMPERED]'
-        const res = await tamperEntry(id, tamperedText, secretKey)
-        setTampering(false)
-        setShowTamperModal(false)
-
+    async function handleSaveTamper() {
+        setIsTampering(true)
+        const res = await tamperEntry(id, tamperText)
+        setIsTampering(false)
         if (res.error) {
             alert(res.error)
         } else {
-            setResult(null) // Reset result so user has to check again
-            alert('Tamper simulated. Text updated. Hash unchanged.')
+            setIsEditing(false)
+            router.refresh() // Refresh to show new text
         }
     }
 
@@ -45,6 +45,15 @@ export function IntegrityControls({ id, currentText }: { id: string, currentText
                 {checking ? 'Checking...' : 'Integrity Check'}
             </button>
 
+            {isAdmin && (
+                <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700"
+                >
+                    Tamper
+                </button>
+            )}
+
             {result && (
                 <span className={`px-4 py-2 rounded-full font-bold text-sm border ${result === 'Match'
                     ? 'bg-green-100 text-green-800 border-green-200'
@@ -54,22 +63,39 @@ export function IntegrityControls({ id, currentText }: { id: string, currentText
                 </span>
             )}
 
-            <div className="flex-grow"></div>
+            {isEditing && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
+                        <h3 className="text-lg font-bold text-gray-900">Tamper Entry</h3>
+                        <p className="text-sm text-gray-500">
+                            Warning: Modifying this text without updating the hash will cause an integrity violation.
+                        </p>
 
-            <button
-                onClick={() => setShowTamperModal(true)}
-                disabled={tampering}
-                className="px-4 py-2 text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 rounded-md text-sm font-medium"
-            >
-                {tampering ? 'Tampering...' : 'Tamper'}
-            </button>
+                        <textarea
+                            value={tamperText}
+                            onChange={(e) => setTamperText(e.target.value)}
+                            className="w-full h-32 p-3 border rounded-md font-mono text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        />
 
-            <TamperModal
-                isOpen={showTamperModal}
-                onClose={() => setShowTamperModal(false)}
-                onConfirm={handleTamper}
-                isTampering={tampering}
-            />
+                        <div className="flex justify-end gap-3 pt-2">
+                            <button
+                                onClick={() => setIsEditing(false)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                                disabled={isTampering}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveTamper}
+                                disabled={isTampering}
+                                className="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50"
+                            >
+                                {isTampering ? 'Saving...' : 'Save & Tamper'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -1,12 +1,18 @@
-'use server'
+
 
 import { getEntries } from '@/data/entry'
 import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
 import { CopyButton } from './CopyButton'
+import { getCurrentUser } from '@/lib/auth'
 
 export async function EntryList() {
-    const entries = await getEntries()
+    const user = await getCurrentUser()
+
+    // If Admin, show ALL entries (undefined). If User, show only theirs (user.userId).
+    const filterUserId = user?.role === 'ADMIN' ? undefined : user?.userId
+
+    const entries = await getEntries(filterUserId)
 
     if (entries.length === 0) {
         return (
