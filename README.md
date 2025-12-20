@@ -63,7 +63,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Tamper Demo
 A "Simulate Tamper" button allows modifying the text *without* updating the hash. This mimics a database intrusion or bit rot.
-- **Security**: Protected by Admin Role.
+
+- **Security**: Protected by Admin Role. The `tamperEntry` server action strictly enforces `user.role === 'ADMIN'` verification on the server side before allowing any changes, and the "Tamper" button is conditionally rendered only for authenticated admins in the UI.
 
 ## User & Admin Setup
 Since there is no public registration for Admins, follow these steps:
