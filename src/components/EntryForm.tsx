@@ -1,35 +1,34 @@
 'use client'
 
 import { createEntry } from '@/actions/entry'
-import { useState } from 'react'
 import { SubmitButton } from './SubmitButton'
+import { useRef } from 'react'
+import { useToast } from '@/components/ui/Toast'
 
 export function EntryForm() {
-    const [error, setError] = useState<string | null>(null)
+    const ref = useRef<HTMLFormElement>(null)
+    const { success, error } = useToast()
 
-    async function handleSubmit(formData: FormData) {
-        setError(null)
-        const res = await createEntry(formData)
-
-        if (res.error) {
-            setError(res.error)
+    async function clientAction(formData: FormData) {
+        const result = await createEntry(formData)
+        if (result.error) {
+            error(result.error)
         } else {
-            const form = document.getElementById('entry-form') as HTMLFormElement
-            form.reset()
+            success('Entry created successfully')
+            ref.current?.reset()
         }
     }
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold mb-4">Create New Entry</h2>
-            <form id="entry-form" action={handleSubmit} className="flex flex-col gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">New Entry</h2>
+            <form ref={ref} action={clientAction} className="flex flex-col gap-4">
                 <textarea
                     name="text"
                     placeholder="Enter text here to generate an integrity hash..."
                     className="w-full p-4 border rounded-md min-h-[120px] focus:ring-2 focus:ring-black focus:outline-none text-gray-800 font-mono text-sm"
                     required
                 />
-                {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
                 <SubmitButton />
             </form>
         </div>

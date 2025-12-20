@@ -11,10 +11,16 @@ export function DeleteButton({ id }: { id: string }) {
     const handleRemove = () => {
         if (!confirm('Are you sure you want to remove this entry?')) return
 
+        // Optimistic UI: Hide row immediately
+        const row = document.getElementById(`entry-row-${id}`)
+        if (row) row.style.display = 'none'
+
         startTransition(async () => {
             const res = await deleteEntry(id)
             if (res.error) {
                 error(res.error)
+                // Revert on error
+                if (row) row.style.display = ''
             } else {
                 success('Entry removed')
             }

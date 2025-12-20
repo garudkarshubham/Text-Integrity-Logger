@@ -64,12 +64,18 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to remove this entry? This cannot be undone.')) return
 
+        // Optimistic UI: Hide immediately
+        const row = document.getElementById(`entry-row-${id}`)
+        if (row) row.style.display = 'none'
+
         setDeletingMap(prev => ({ ...prev, [id]: true }))
         try {
             await deleteEntry(id)
             success('Entry removed')
         } catch (e) {
             error('Failed to remove')
+            // Revert if failed
+            if (row) row.style.display = ''
         } finally {
             setDeletingMap(prev => ({ ...prev, [id]: false }))
         }
@@ -109,7 +115,7 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
                             </tr>
                         ) : (
                             entries.map((entry) => (
-                                <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={entry.id} id={`entry-row-${entry.id}`} className="hover:bg-gray-50 transition-colors">
                                     <td className="p-4 max-w-xs font-mono text-gray-700 truncate" title={entry.text}>
                                         {entry.text}
                                     </td>

@@ -36,7 +36,7 @@ export async function EntryList() {
                 </thead>
                 <tbody className="bg-white divide-y">
                     {entries.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
+                        <tr key={entry.id} id={`entry-row-${entry.id}`} className="hover:bg-gray-50 transition-colors">
                             <td className="p-4 max-w-xs font-mono text-gray-700 truncate" title={entry.text}>
                                 <Link
                                     href={`/entries/${entry.id}`}
