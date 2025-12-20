@@ -32,7 +32,7 @@ async function main() {
             data: { password: hashedPassword },
         })
         console.log(`Success! Password for '${user.email}' has been updated.`)
-    } catch (_error) {
+    } catch {
         console.error('Failed to update password. Make sure the email exists.')
         // console.error(error)
     }

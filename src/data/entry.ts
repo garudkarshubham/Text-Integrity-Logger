@@ -23,7 +23,7 @@ export async function getEntries(userId?: string): Promise<Entry[]> {
             where,
             orderBy: { createdAt: 'desc' },
         }) as Entry[]
-    } catch (_error) {
+    } catch {
         return []
     }
 }
@@ -33,7 +33,7 @@ export async function getEntryById(id: string): Promise<Entry | null> {
         return await prisma.entry.findUnique({
             where: { id }
         })
-    } catch (_error) {
+    } catch {
         return null
     }
 }

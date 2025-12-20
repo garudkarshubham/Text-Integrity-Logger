@@ -37,8 +37,8 @@ describe('Entry Actions', () => {
         expect(prisma.entry.create).not.toHaveBeenCalled()
     })
 
-    // Integrity check returns Match when text matches hash
-    it('should return Match when integrity is intact', async () => {
+    // Integrity check returns Verified when text matches hash
+    it('should return Verified when integrity is intact', async () => {
         // Mock existing entry
         const mockEntry = {
             id: 'test-id',
@@ -46,6 +46,7 @@ describe('Entry Actions', () => {
             hash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e', // SHA256 of "Hello World"
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as unknown as any)
 
         const result = await checkIntegrity('test-id')
@@ -53,14 +54,15 @@ describe('Entry Actions', () => {
         expect(result.result).toBe('Verified')
     })
 
-    // Integrity check returns Changed after Tamper
-    it('should return Changed when text is tampered', async () => {
+    // Integrity check returns Tampered after Tamper
+    it('should return Tampered when text is tampered', async () => {
         // Mock entry where text differs from hash
         const mockEntry = {
             id: 'test-id',
             text: 'Hello World [TAMPERED]',
             hash: 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e', // Still hash of "Hello World"
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(prisma.entry.findUnique).mockResolvedValue(mockEntry as unknown as any)
 
         const result = await checkIntegrity('test-id')

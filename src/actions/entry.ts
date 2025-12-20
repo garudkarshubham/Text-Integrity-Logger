@@ -58,7 +58,7 @@ export async function checkIntegrity(id: string) {
 
         revalidatePath('/')
         return { result }
-    } catch (_error) {
+    } catch {
         return { error: 'Failed to check integrity' }
     }
 }
@@ -72,7 +72,7 @@ export async function deleteEntry(id: string) {
         await prisma.entry.delete({ where: { id } })
         revalidatePath('/')
         return { success: true }
-    } catch (_error) {
+    } catch {
         return { error: 'Failed to delete' }
     }
 }
@@ -93,7 +93,7 @@ export async function tamperEntry(id: string, newText: string) {
         })
         revalidatePath(`/entries/${id}`)
         return { success: true }
-    } catch (_e) {
+    } catch {
         return { error: 'Failed to tamper' }
     }
 }
