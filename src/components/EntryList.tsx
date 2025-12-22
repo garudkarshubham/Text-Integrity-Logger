@@ -5,6 +5,7 @@ import { Entry } from '@/data/entry'
 import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
 import { CopyButton } from './CopyButton'
+import { IntegrityCheckButton } from './IntegrityCheckButton'
 
 export function EntryList({ entries }: { entries: Entry[] }) {
     if (entries.length === 0) {
@@ -53,19 +54,22 @@ export function EntryList({ entries }: { entries: Entry[] }) {
                                 {entry.createdAt.toLocaleString()}
                             </td>
                             <td className="p-4">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified')
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(entry.integrityStatus === 'Match' || entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified')
                                     ? 'bg-green-100 text-green-800 border-green-200'
                                     : (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered')
                                         ? 'bg-red-100 text-red-800 border-red-200'
                                         : 'bg-gray-100 text-gray-800 border-gray-200'
                                     }`}>
-                                    {(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified') ? 'Checked' :
+                                    {(entry.integrityStatus === 'Match' || entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified') ? 'Match' :
                                         (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered') ? 'Changed' :
                                             'Not Checked'}
                                 </span>
                             </td>
                             <td className="p-4 text-right">
-                                <DeleteButton id={entry.id} />
+                                <div className="flex items-center justify-end gap-3">
+                                    <IntegrityCheckButton id={entry.id} />
+                                    <DeleteButton id={entry.id} />
+                                </div>
                             </td>
                         </tr>
                     ))}

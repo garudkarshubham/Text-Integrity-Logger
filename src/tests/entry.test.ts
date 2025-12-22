@@ -43,8 +43,8 @@ describe('Entry Actions', () => {
         expect(prisma.entry.create).not.toHaveBeenCalled()
     })
 
-    // Integrity check returns Checked when text matches hash
-    it('should return Checked when integrity is intact', async () => {
+    // Integrity check returns Match when text matches hash
+    it('should return Match when integrity is intact', async () => {
         // Mock existing entry
         const mockEntry = {
             id: 'test-id',
@@ -57,7 +57,7 @@ describe('Entry Actions', () => {
 
         const result = await checkIntegrity('test-id')
 
-        expect(result.result).toBe('Checked')
+        expect(result.result).toBe('Match')
     })
 
     // Integrity check returns Changed after Tamper

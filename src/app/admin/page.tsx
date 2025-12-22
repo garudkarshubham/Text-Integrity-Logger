@@ -1,4 +1,3 @@
-import { EntryForm } from '@/components/EntryForm'
 import { EntryManager } from '@/components/EntryManager'
 import { Suspense } from 'react'
 import { getCurrentUser } from '@/lib/auth'

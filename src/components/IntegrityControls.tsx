@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 
 export function IntegrityControls({ id, currentText, isAdmin }: { id: string, currentText: string, isAdmin?: boolean }) {
-    const [result, setResult] = useState<'Checked' | 'Changed' | null>(null)
+    const [result, setResult] = useState<'Match' | 'Changed' | null>(null)
     const [checking, setChecking] = useState(false)
     const router = useRouter()
     const { success, error } = useToast()
@@ -21,8 +21,8 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
         const res = await checkIntegrity(id)
         setChecking(false)
         if (res.result) {
-            setResult(res.result as 'Checked' | 'Changed')
-            if (res.result === 'Checked') {
+            setResult(res.result as 'Match' | 'Changed')
+            if (res.result === 'Match') {
                 success('Integrity Verified: Hash matches content')
             } else {
                 error('Integrity Warning: Content has been changed')
@@ -65,11 +65,11 @@ export function IntegrityControls({ id, currentText, isAdmin }: { id: string, cu
             )}
 
             {result && (
-                <span className={`px-4 py-2 rounded-full font-bold text-sm border ${result === 'Checked'
+                <span className={`px-4 py-2 rounded-full font-bold text-sm border ${result === 'Match'
                     ? 'bg-green-100 text-green-800 border-green-200'
                     : 'bg-red-100 text-red-800 border-red-200'
                     }`}>
-                    {result === 'Checked' ? 'Checked' : 'Changed'}
+                    {result === 'Match' ? 'Match' : 'Changed'}
                 </span>
             )}
 
