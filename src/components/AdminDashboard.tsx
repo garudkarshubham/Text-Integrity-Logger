@@ -49,8 +49,8 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
         setCheckingMap(prev => ({ ...prev, [id]: true }))
         try {
             const res = await checkIntegrity(id)
-            if (res.result === 'Checked') {
-                success('Checked: Integrity Match')
+            if (res.result === 'Match') {
+                success('Integrity Match')
             } else if (res.result === 'Changed') {
                 error('Warning: Integrity Violation')
             }
@@ -128,14 +128,14 @@ export function AdminDashboard({ entries }: { entries: Entry[] }) {
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified')
-                                                ? 'bg-green-100 text-green-800 border-green-200'
-                                                : (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered')
-                                                    ? 'bg-red-100 text-red-800 border-red-200'
-                                                    : 'bg-gray-100 text-gray-800 border-gray-200'
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${entry.integrityStatus === 'Match'
+                                            ? 'bg-green-100 text-green-800 border-green-200'
+                                            : entry.integrityStatus === 'Changed'
+                                                ? 'bg-red-100 text-red-800 border-red-200'
+                                                : 'bg-gray-100 text-gray-800 border-gray-200'
                                             }`}>
-                                            {(entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified') ? 'Checked' :
-                                                (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered') ? 'Changed' :
+                                            {entry.integrityStatus === 'Match' ? 'Match' :
+                                                entry.integrityStatus === 'Changed' ? 'Changed' :
                                                     'Not Checked'}
                                         </span>
                                     </td>

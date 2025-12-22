@@ -16,7 +16,7 @@ export async function createEntry(formData: FormData) {
         const text = formData.get('text')
 
         if (typeof text !== 'string') {
-            return { error: 'Text is required' }
+            return { error: 'Text cannot be empty' }
         }
 
         const validation = EntrySchema.safeParse({ text })
@@ -47,8 +47,15 @@ export async function createEntry(formData: FormData) {
 
 export async function checkIntegrity(id: string) {
     try {
+        const user = await requireUser() // Ensure user is logged in first
+
         const entry = await prisma.entry.findUnique({ where: { id } })
         if (!entry) return { error: 'Entry not found' }
+
+        // Security Check: Only Owner or Admin can check integrity
+        if (user.role !== 'ADMIN' && entry.userId !== user.userId) {
+            return { error: 'Unauthorized: You can only check your own entries' }
+        }
 
         // Recompute hash from current DB text
         const currentHash = computeHash(entry.text)
@@ -72,17 +79,28 @@ export async function deleteEntry(id: string) {
     try {
         const user = await requireUser()
 
-        const entry = await prisma.entry.findUnique({ where: { id } })
-        if (!entry) return { error: 'Entry not found' }
+        const whereClause = user.role === 'ADMIN'
+            ? { id }
+            : { id, userId: user.userId }
 
-        if (user.role !== 'ADMIN' && entry.userId !== user.userId) {
-            return { error: 'Unauthorized: You can only delete your own entries' }
+        // Attempt delete with strict condition
+        // If entry doesn't exist OR doesn't belong to user, this will throw "Record to delete does not exist."
+        try {
+            await prisma.entry.delete({ where: whereClause })
+        } catch (error) {
+            // Prisma error code P2025 means "Record to delete does not exist."
+            if ((error as { code?: string }).code === 'P2025') {
+                return { error: 'Unauthorized: You can only delete your own entries' }
+            }
+            throw error // Re-throw other errors
         }
 
-        await prisma.entry.delete({ where: { id } })
         revalidatePath('/')
         return { success: true }
-    } catch {
+    } catch (error) {
+        if ((error as { message?: string }).message?.includes('Unauthorized')) {
+            return { error: 'Unauthorized: You can only delete your own entries' }
+        }
         return { error: 'Failed to delete' }
     }
 }

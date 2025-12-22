@@ -18,7 +18,7 @@ export function IntegrityCheckButton({ id }: { id: string }) {
         if (res.result) {
             router.refresh()
             if (res.result === 'Match') {
-                success('Integrity Verified: Matches Original')
+                success('Integrity Match: Matches Original')
             } else {
                 error('Integrity Warning: Content changed')
             }

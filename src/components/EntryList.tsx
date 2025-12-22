@@ -54,14 +54,14 @@ export function EntryList({ entries }: { entries: Entry[] }) {
                                 {entry.createdAt.toLocaleString()}
                             </td>
                             <td className="p-4">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(entry.integrityStatus === 'Match' || entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified')
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${entry.integrityStatus === 'Match'
                                     ? 'bg-green-100 text-green-800 border-green-200'
-                                    : (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered')
+                                    : entry.integrityStatus === 'Changed'
                                         ? 'bg-red-100 text-red-800 border-red-200'
                                         : 'bg-gray-100 text-gray-800 border-gray-200'
                                     }`}>
-                                    {(entry.integrityStatus === 'Match' || entry.integrityStatus === 'Checked' || entry.integrityStatus === 'Verified') ? 'Match' :
-                                        (entry.integrityStatus === 'Changed' || entry.integrityStatus === 'Tampered') ? 'Changed' :
+                                    {entry.integrityStatus === 'Match' ? 'Match' :
+                                        entry.integrityStatus === 'Changed' ? 'Changed' :
                                             'Not Checked'}
                                 </span>
                             </td>
